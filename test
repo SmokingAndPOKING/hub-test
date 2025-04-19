@@ -22,8 +22,8 @@ library:init()
 
 
 -- 🛠️ Mobile UI Adjustment
-local UserInputService = game:GetService("UserInputService")
-local isMobile = UserInputService.TouchEnabled and not UserInputService.KeyboardEnabled
+local uis = game:GetService("UserInputService")
+local isMobile = uis.TouchEnabled and not uis.KeyboardEnabled
 
 if isMobile then
     -- Resize main window for mobile
@@ -282,6 +282,22 @@ RunService.RenderStepped:Connect(function()
         end
     end
 end)
+
+
+-- ✅ FIXED: updateCursor for Mobile/Desktop safety
+local function updateCursor()
+    if uis.TouchEnabled and not uis.KeyboardEnabled then return end -- Skip on mobile
+    local mousePosRaw = uis:GetMouseLocation()
+    if mousePosRaw then
+        local mousePos = mousePosRaw - Vector2.new(0, 36)
+        if cursor then
+            cursor.Position = UDim2.new(0, mousePos.X, 0, mousePos.Y)
+        end
+    else
+        warn("Mouse location is nil - cannot update cursor")
+    end
+end
+
 
 -- 🕒 Final Load Notification
 local Time = (string.format("%." .. tostring(Decimals) .. "f", os.clock() - Clock))
